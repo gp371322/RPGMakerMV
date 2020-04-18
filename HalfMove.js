@@ -6,6 +6,7 @@
 // http://opensource.org/licenses/mit-license.php
 // ----------------------------------------------------------------------------
 // Version
+// 1.16.1+ 2020/04/18 タッチ移動時かつ隊列歩行でないときは半歩移動しないよう仕様変更
 // 1.16.0 2020/04/18 右上、右下、左上、左下のみ移動可能な地形、リージョンの設定を追加
 // 1.15.4 2020/04/15 英語版の一部のパラメータの型指定と初期値が日本語版と合っていなかった問題を修正
 // 1.15.3 2019/11/14 通行設定(4方向)の北の方を通行不可にしたタイルに南の中央から侵入すると半歩分は通行可能にもかかわらず通行不可判定されてしまう問題を修正
@@ -1812,7 +1813,12 @@
     //  乗り物搭乗中は半歩移動を無効にします。
     //=============================================================================
     Game_Player.prototype.isHalfMove = function() {
-        return Game_Character.prototype.isHalfMove.call(this) && !this.isInVehicle();
+        return Game_Character.prototype.isHalfMove.call(this) && !this.isInVehicle() && !this.canSimpleMapTouchMove();
+    };
+
+    Game_Player.prototype.canSimpleMapTouchMove = function() {
+        return $gameTemp.isDestinationValid() && !this.isHalfPosX() && !this.isHalfPosY() &&
+            (!this.followers().isVisible() || $gameParty.members().length <= 1);
     };
 
     //=============================================================================
